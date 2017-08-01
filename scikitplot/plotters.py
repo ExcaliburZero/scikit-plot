@@ -22,8 +22,9 @@ from sklearn.metrics import silhouette_score
 from sklearn.metrics import silhouette_samples
 
 
-def plot_confusion_matrix(y_true, y_pred, labels=None, title=None, normalize=False, hide_zeros=False,
-                          x_tick_rotation=0, ax=None, figsize=None, title_fontsize="large", text_fontsize="medium"):
+def plot_confusion_matrix(y_true, y_pred, labels=None, true_label_indexes=None, pred_label_indexes=None, title=None,
+                          normalize=False, hide_zeros=False, x_tick_rotation=0, ax=None, figsize=None,
+                          title_fontsize="large", text_fontsize="medium"):
     """Generates confusion matrix plot for a given set of ground truth labels and classifier predictions.
 
     Args:
@@ -37,6 +38,12 @@ def plot_confusion_matrix(y_true, y_pred, labels=None, title=None, normalize=Fal
             index the matrix. This may be used to reorder or select a subset of labels.
             If none is given, those that appear at least once in ``y_true`` or
             ``y_pred`` are used in sorted order. (new in v0.2.5)
+
+        true_label_indexes (array-like, optional): The indexes of the true labels to display.
+            If none is given, then all of the labels are used.
+
+        pred_label_indexes (array-like, optional): The indexes of the predicted labels to display.
+            If none is given, then all of the labels are used.
 
         title (string, optional): Title of the generated plot. Defaults to "Confusion Matrix" if
             `normalize` is True. Else, defaults to "Normalized Confusion Matrix.
@@ -87,6 +94,18 @@ def plot_confusion_matrix(y_true, y_pred, labels=None, title=None, normalize=Fal
     else:
         classes = np.asarray(labels)
 
+    if true_label_indexes is None:
+        true_classes = classes
+    else:
+        true_classes = classes[true_label_indexes]
+        cm = cm[true_label_indexes]
+
+    if pred_label_indexes is None:
+        pred_classes = classes
+    else:
+        pred_classes = classes[pred_label_indexes]
+        cm = cm[:,pred_label_indexes][:,0,:]
+
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         cm = np.around(cm, decimals=2)
@@ -101,11 +120,12 @@ def plot_confusion_matrix(y_true, y_pred, labels=None, title=None, normalize=Fal
 
     image = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
     plt.colorbar(mappable=image)
-    tick_marks = np.arange(len(classes))
-    ax.set_xticks(tick_marks)
-    ax.set_xticklabels(classes, fontsize=text_fontsize, rotation=x_tick_rotation)
-    ax.set_yticks(tick_marks)
-    ax.set_yticklabels(classes, fontsize=text_fontsize)
+    x_tick_marks = np.arange(len(pred_classes))
+    y_tick_marks = np.arange(len(true_classes))
+    ax.set_xticks(x_tick_marks)
+    ax.set_xticklabels(pred_classes, fontsize=text_fontsize, rotation=x_tick_rotation)
+    ax.set_yticks(y_tick_marks)
+    ax.set_yticklabels(true_classes, fontsize=text_fontsize)
 
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):

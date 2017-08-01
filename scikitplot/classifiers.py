@@ -53,9 +53,10 @@ def classifier_factory(clf):
     return clf
 
 
-def plot_confusion_matrix(clf, X, y, labels=None, title=None, normalize=False, hide_zeros=False,
-                          x_tick_rotation=0, do_cv=True, cv=None, shuffle=True, random_state=None,
-                          ax=None, figsize=None, title_fontsize="large", text_fontsize="medium"):
+def plot_confusion_matrix(clf, X, y, labels=None, true_label_indexes=None, pred_label_indexes=None,
+                          title=None, normalize=False, hide_zeros=False, x_tick_rotation=0,
+                          do_cv=True, cv=None, shuffle=True, random_state=None, ax=None,
+                          figsize=None, title_fontsize="large", text_fontsize="medium"):
     """Generates the confusion matrix for a given classifier and dataset.
 
     Args:
@@ -72,6 +73,12 @@ def plot_confusion_matrix(clf, X, y, labels=None, title=None, normalize=False, h
             index the matrix. This may be used to reorder or select a subset of labels.
             If none is given, those that appear at least once in ``y`` are used in sorted order.
             (new in v0.2.5)
+
+        true_label_indexes (array-like, optional): The indexes of the true labels to display.
+            If none is given, then all of the labels are used.
+
+        pred_label_indexes (array-like, optional): The indexes of the predicted labels to display.
+            If none is given, then all of the labels are used.
 
         title (string, optional): Title of the generated plot. Defaults to "Confusion Matrix" if
             `normalize` is True. Else, defaults to "Normalized Confusion Matrix.
